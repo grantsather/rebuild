@@ -561,7 +561,7 @@ function renderCloud(){
         +'<li>Wait ~2 min for it to build. Then open <b>Project Settings → API</b>.</li>'
         +'<li>Copy the <b>Project URL</b> and the <b>anon public</b> key into the two boxes above.</li>'
         +'<li>Open <b>SQL Editor → New query</b>, paste the snippet below, and hit <b>Run</b>. This creates your private table.</li>'
-        +'<li>Open <b>Authentication → URL Configuration</b>. Set <b>Site URL</b> to this app’s web address, and add the same address under <b>Redirect URLs</b>. (This is the Netlify link you opened this app from.)</li>'
+        +'<li>Open <b>Authentication → URL Configuration</b>. Set <b>Site URL</b> to this app’s web address, and add the same address (with a <code>/**</code> on the end) under <b>Redirect URLs</b>. (This is the GitHub Pages link you opened this app from.)</li>'
         +'<li>Come back here, tap <b>Connect project</b>, then sign in with your email.</li>'
         +'</ol>'
         +'<div style="height:8px"></div><button class="btn ghost sm" onclick="copySQL()" style="width:100%">⧉ Copy database snippet</button>'
