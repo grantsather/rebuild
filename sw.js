@@ -1,6 +1,8 @@
-/* Rebuild service worker — caches the app shell so it launches offline (e.g. at the gym).
-   Cross-origin requests (Supabase, esm.sh) are left to the network so sync data is never stale. */
-const CACHE = 'rebuild-v2';
+/* Rebuild service worker — network-first for the app shell so updates always
+   reach the device when online, with a cached fallback so it still launches
+   offline (e.g. at the gym). Cross-origin requests (Supabase, esm.sh) are left
+   to the network so synced data is never stale. */
+const CACHE = 'rebuild-v3';
 const SHELL = ['./', './index.html'];
 
 self.addEventListener('install', (e) => {
@@ -22,13 +24,12 @@ self.addEventListener('fetch', (e) => {
   try { url = new URL(req.url); } catch (_) { return; }
   // Only handle same-origin (the app shell). Let Supabase/CDN go straight to network.
   if (url.origin !== self.location.origin) return;
+  // Network-first: always try the freshest shell, cache it, fall back to cache offline.
   e.respondWith(
-    caches.match(req).then((hit) =>
-      hit || fetch(req).then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
-        return res;
-      }).catch(() => caches.match('./index.html'))
-    )
+    fetch(req).then((res) => {
+      const copy = res.clone();
+      caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+      return res;
+    }).catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
   );
 });
