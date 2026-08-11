@@ -52,7 +52,7 @@
   .btn.ghost{background:transparent;}
   .btn.sm{padding:9px 12px;font-size:13px;width:auto;}
   .btn.danger{color:var(--danger);border-color:rgba(255,92,108,.4);background:rgba(255,92,108,.08);}
-  .daysel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:6px;}
+  .daysel{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:6px;}
   .daysel .d{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;}
   .daysel .d.on{border-color:var(--accent);background:rgba(201,82,47,.12);}
   .daysel .d .l{font-weight:800;font-size:16px;}
@@ -153,8 +153,9 @@
       <h2>Start a workout</h2>
       <div class="daysel">
         <div class="d" data-day="A" onclick="startDay('A')"><div class="l">A</div><div class="n">Lower</div></div>
-        <div class="d" data-day="B" onclick="startDay('B')"><div class="l">B</div><div class="n">Upper</div></div>
-        <div class="d" data-day="C" onclick="startDay('C')"><div class="l">C</div><div class="n">Full</div></div>
+        <div class="d" data-day="B" onclick="startDay('B')"><div class="l">B</div><div class="n">Back / Bi</div></div>
+        <div class="d" data-day="C" onclick="startDay('C')"><div class="l">C</div><div class="n">Chest / Tri</div></div>
+        <div class="d" data-day="D" onclick="startDay('D')"><div class="l">D</div><div class="n">Shldr / 4arm</div></div>
       </div>
       <div class="note"><b>Ramp:</b> Wk 1–2 stop 3–4 reps shy of failure · Wk 3–4 stop 2–3 shy · Wk 5+ push to 1–2 shy. Hit the top of a rep range on every set → add weight next time.</div>
       <div id="quickStats"></div>
@@ -282,17 +283,21 @@ function WT(){ return load().weights.filter(function(x){return !x.deleted;}).sli
 /* ============ plan ============ */
 var PLAN={
   A:{name:'Lift A · Lower Body',ex:[
-    {n:'Goblet / Leg-Press Squat',t:'3–4 × 8–10',sets:4},{n:'Romanian Deadlift',t:'3 × 8–10',sets:3},
-    {n:'Walking Lunge / Split Squat',t:'3 × 10/leg',sets:3},{n:'Seated Leg Curl',t:'3 × 12–15',sets:3},
-    {n:'Standing Calf Raise',t:'3 × 12–15',sets:3},{n:'Hanging / Cable Core',t:'3 × 12–15',sets:3}]},
-  B:{name:'Lift B · Upper Body',ex:[
-    {n:'DB / BB Bench Press',t:'3–4 × 6–10',sets:4},{n:'Cable / DB Row',t:'3–4 × 8–12',sets:4},
-    {n:'Seated DB Shoulder Press',t:'3 × 8–12',sets:3},{n:'Lat Pulldown',t:'3 × 10–12',sets:3},
-    {n:'Face Pull',t:'3 × 15',sets:3},{n:'Biceps + Triceps Superset',t:'2–3 × 12',sets:3}]},
-  C:{name:'Lift C · Full Body',ex:[
-    {n:'Trap-Bar / Conv. Deadlift',t:'3 × 5–8',sets:3},{n:'Incline DB Press',t:'3 × 8–12',sets:3},
-    {n:'Assisted Pull-Up / Pulldown',t:'3 × 8–12',sets:3},{n:'DB Lateral Raise',t:'3 × 12–15',sets:3},
-    {n:'Hip Thrust / Back Extension',t:'3 × 10–12',sets:3},{n:"Farmer's Carry",t:'3 × 40yd',sets:3}]}
+    {n:'Hip Sled',t:'3–4 × 8–12',sets:4},{n:'Leg Extension',t:'3 × 10–15',sets:3},
+    {n:'Leg Curl',t:'3 × 10–15',sets:3},{n:'Standing Calf Raise',t:'3–4 × 12–15',sets:4},
+    {n:'AbCoaster',t:'3 × 12–20',sets:3}]},
+  B:{name:'Lift B · Back / Biceps',ex:[
+    {n:'Lat Pulldown',t:'3–4 × 8–12',sets:4},{n:'Seated Cable Row',t:'3–4 × 8–12',sets:4},
+    {n:'Chest-Supported / 1-Arm DB Row',t:'3 × 10–12',sets:3},{n:'EZ-Bar / DB Biceps Curl',t:'3 × 8–12',sets:3},
+    {n:'Cable / Hammer Curl',t:'3 × 12–15',sets:3}]},
+  C:{name:'Lift C · Chest / Triceps',ex:[
+    {n:'Barbell / Machine Bench Press',t:'3–4 × 6–10',sets:4},{n:'Incline DB Press',t:'3 × 8–12',sets:3},
+    {n:'Pec Deck / Cable Fly',t:'3 × 12–15',sets:3},{n:'Triceps Rope Pushdown',t:'3 × 10–15',sets:3},
+    {n:'Overhead Triceps Extension',t:'3 × 10–15',sets:3}]},
+  D:{name:'Lift D · Shoulders / Forearms',ex:[
+    {n:'Seated Shoulder Press',t:'3–4 × 8–12',sets:4},{n:'Lateral Raise',t:'3–4 × 12–20',sets:4},
+    {n:'Rear-Delt Pec Deck / Face Pull',t:'3 × 15',sets:3},{n:'DB / Cable Shrug',t:'3 × 12–15',sets:3},
+    {n:'Wrist Curl + Reverse Curl',t:'3 × 15',sets:3}]}
 };
 
 /* ============ helpers ============ */
