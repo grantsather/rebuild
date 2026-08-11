@@ -591,13 +591,13 @@ function renderCloud(){
     var emailVal=(window.__pendingEmail||'').replace(/"/g,'&quot;');
     box.innerHTML=''
       +'<div class="cloudhead"><b>Sign in to sync</b><span class="st"><span class="dot off"></span>signed out</span></div>'
-      +'<div class="note" style="margin-top:10px">We email you a 6-digit code — enter it here. No link to tap, so it works right inside the installed app. You stay signed in after that.</div>'
+      +'<div class="note" style="margin-top:10px">We email you a login code — enter it here. No link to tap, so it works right inside the installed app. You stay signed in after that.</div>'
       +'<div class="field" style="margin-bottom:12px"><label>Email</label><input id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" value="'+emailVal+'"></div>'
       +(stage==='code'
-        ? '<div class="field" style="margin-bottom:12px"><label>6-digit code from email</label><input id="authCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></div>'
+        ? '<div class="field" style="margin-bottom:12px"><label>Code from email</label><input id="authCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Enter code"></div>'
           +'<button class="btn accent" onclick="verifyCode()">Verify &amp; sign in</button>'
           +'<div style="height:8px"></div><button class="btn ghost sm" style="width:100%" onclick="sendCode()">Resend code</button>'
-        : '<button class="btn accent" onclick="sendCode()">Email me a 6-digit code</button>')
+        : '<button class="btn accent" onclick="sendCode()">Email me a login code</button>')
       +'<div id="cloudErr" style="color:var(--danger);font-size:12px;padding:6px 0"></div>'
       +'<div style="height:10px"></div><button class="btn ghost sm" style="width:100%" onclick="changeProject()">Disconnect project</button>';
     return;
