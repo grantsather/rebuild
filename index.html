@@ -481,25 +481,27 @@ function connectCloud(){
   if(!window.__createClient){ toast('Connect to the internet first'); return; }
   setCfg({url:url,key:key}); toast('Connected — now sign in'); initCloud();
 }
-function sendCode(){
+function toggleAuthMode(){ window.__authMode=(window.__authMode==='signup')?'signin':'signup'; window.__pendingEmail=((document.getElementById('authEmail')||{}).value||'').trim(); renderCloud(); }
+function _authRead(){ return {email:((document.getElementById('authEmail')||{}).value||'').trim(), pass:((document.getElementById('authPass')||{}).value||'')}; }
+function signInPassword(){
   if(!supa){ toast('Connect your project first'); return; }
-  var email=(document.getElementById('authEmail').value||'').trim();
-  if(!/.+@.+\..+/.test(email)){ toast('Enter a valid email'); return; }
-  window.__pendingEmail=email;
-  supa.auth.signInWithOtp({email:email, options:{shouldCreateUser:true}}).then(function(res){
-    if(res.error){ toast(res.error.message); }
-    else { window.__authStage='code'; renderCloud(); toast('Code sent — check your email'); }
+  var a=_authRead();
+  if(!/.+@.+\..+/.test(a.email)){ toast('Enter a valid email'); return; }
+  if(!a.pass){ toast('Enter your password'); return; }
+  supa.auth.signInWithPassword({email:a.email,password:a.pass}).then(function(res){
+    if(res.error){ var el=document.getElementById('cloudErr'); if(el) el.textContent=res.error.message; }
+    else { toast('Signed in'); } // onAuthStateChange sets session + syncs
   });
 }
-function verifyCode(){
-  if(!supa){ return; }
-  var emEl=document.getElementById('authEmail');
-  var email=(window.__pendingEmail||(emEl?emEl.value:'')||'').trim();
-  var token=((document.getElementById('authCode')||{}).value||'').trim();
-  if(token.length<6){ toast('Enter the 6-digit code'); return; }
-  supa.auth.verifyOtp({email:email, token:token, type:'email'}).then(function(res){
-    if(res.error){ var el=document.getElementById('cloudErr'); if(el) el.textContent=res.error.message; toast('That code didn’t work'); }
-    else { window.__authStage='enter'; window.__pendingEmail=''; toast('Signed in'); } // onAuthStateChange sets session + syncs
+function signUpPassword(){
+  if(!supa){ toast('Connect your project first'); return; }
+  var a=_authRead();
+  if(!/.+@.+\..+/.test(a.email)){ toast('Enter a valid email'); return; }
+  if(a.pass.length<6){ toast('Use at least 6 characters'); return; }
+  supa.auth.signUp({email:a.email,password:a.pass}).then(function(res){
+    if(res.error){ var el=document.getElementById('cloudErr'); if(el) el.textContent=res.error.message; return; }
+    if(res.data&&res.data.session){ toast('Account created — signed in'); } // email-confirm off => instant session
+    else { window.__authMode='signin'; renderCloud(); var el=document.getElementById('cloudErr'); if(el) el.textContent='Account created — now tap Sign in.'; }
   });
 }
 function signOutCloud(){ if(supa) supa.auth.signOut().then(function(){ session=null; renderCloud(); }); }
@@ -587,19 +589,19 @@ function renderCloud(){
     return;
   }
   if(supa && !session){ // configured, signed out
-    var stage=window.__authStage||'enter';
+    var mode=window.__authMode||'signin';
     var emailVal=(window.__pendingEmail||'').replace(/"/g,'&quot;');
     box.innerHTML=''
-      +'<div class="cloudhead"><b>Sign in to sync</b><span class="st"><span class="dot off"></span>signed out</span></div>'
-      +'<div class="note" style="margin-top:10px">We email you a login code — enter it here. No link to tap, so it works right inside the installed app. You stay signed in after that.</div>'
-      +'<div class="field" style="margin-bottom:12px"><label>Email</label><input id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" value="'+emailVal+'"></div>'
-      +(stage==='code'
-        ? '<div class="field" style="margin-bottom:12px"><label>Code from email</label><input id="authCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Enter code"></div>'
-          +'<button class="btn accent" onclick="verifyCode()">Verify &amp; sign in</button>'
-          +'<div style="height:8px"></div><button class="btn ghost sm" style="width:100%" onclick="sendCode()">Resend code</button>'
-        : '<button class="btn accent" onclick="sendCode()">Email me a login code</button>')
+      +'<div class="cloudhead"><b>'+(mode==='signup'?'Create your login':'Sign in to sync')+'</b><span class="st"><span class="dot off"></span>signed out</span></div>'
+      +'<div class="note" style="margin-top:10px">'+(mode==='signup'
+          ? 'Pick a password (a 6-digit PIN is fine) you’ll remember. No email needed — set it once and you stay signed in.'
+          : 'Enter your email and password. You stay signed in on this device after that — no logging in every workout.')+'</div>'
+      +'<div class="field" style="margin-bottom:10px"><label>Email</label><input id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" value="'+emailVal+'"></div>'
+      +'<div class="field" style="margin-bottom:12px"><label>Password'+(mode==='signup'?' (min 6 characters)':'')+'</label><input id="authPass" type="password" autocomplete="'+(mode==='signup'?'new-password':'current-password')+'" placeholder="••••••"></div>'
+      +'<button class="btn accent" onclick="'+(mode==='signup'?'signUpPassword()':'signInPassword()')+'">'+(mode==='signup'?'Create account &amp; sign in':'Sign in')+'</button>'
       +'<div id="cloudErr" style="color:var(--danger);font-size:12px;padding:6px 0"></div>'
-      +'<div style="height:10px"></div><button class="btn ghost sm" style="width:100%" onclick="changeProject()">Disconnect project</button>';
+      +'<div style="height:6px"></div><button class="btn ghost sm" style="width:100%" onclick="toggleAuthMode()">'+(mode==='signup'?'‹ I already have a login':'First time here? Create a login')+'</button>'
+      +'<div style="height:6px"></div><button class="btn ghost sm" style="width:100%" onclick="changeProject()">Disconnect project</button>';
     return;
   }
   if(supa && session){ // signed in
